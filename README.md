@@ -10,5 +10,6 @@
 **THINGS TO REMEMBER**
 
   -Make sure to flush the buffer before a newline
+  
   -The onboard checksum has no overflow detection so make sure to take that into account
   
