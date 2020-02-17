@@ -8,7 +8,7 @@
 
 Serial device(D1,D0);
 Serial pc(USBTX, USBRX);
-const unsigned int PACKET_SIZE =10;
+const unsigned int PACKET_SIZE =11;
 int main()
 { 
     device.baud(9600);  
@@ -43,8 +43,8 @@ int main()
         if(device.readable()){
             uint8_t buffer[PACKET_SIZE];
             device.gets((char*) buffer,PACKET_SIZE);
-            for(int i=0; i<PACKET_SIZE; i++){
-                pc.printf("%d ",buffer[i]);
+            for(int i=0; i<PACKET_SIZE-1; i++){
+                pc.printf("%X ",buffer[i]);
             }
             pc.printf("---- \r\n");
         }   
