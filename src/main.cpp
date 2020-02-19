@@ -51,13 +51,13 @@ int main()
             }
 
             if(correctContentOrder == true){
-                int PM2_5Value = buffer[3] * 256 + buffer[2]/10;
-                int PM10Value = buffer[5] *256 + buffer[4]/10;
+                double PM2_5Value = buffer[3] * 256 + buffer[2]/10.0;
+                double PM10Value = buffer[5] *256 + buffer[4]/10.0;
                 
 
                 pc.printf("the sensorID is %X %X \r\n", buffer[6],buffer[7]);
-                pc.printf("The air contains %d µg/m³ of PM2.5 \r\n", PM2_5Value);
-                pc.printf("The air contains %d µg/m³ of PM10 \r\n", PM10Value);
+                pc.printf("The air contains %.1lf µg/m³ of PM2.5 \r\n", PM2_5Value);
+                pc.printf("The air contains %.1lf µg/m³ of PM10 \r\n", PM10Value);
                 pc.printf("The current Checksum is %d en should be %d \r\n\n",checkSum(2,7,buffer),buffer[8]);
             } else {
                 pc.printf("Data is corrupt \r\n");
