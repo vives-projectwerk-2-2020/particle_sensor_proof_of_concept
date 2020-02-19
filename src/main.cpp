@@ -51,8 +51,8 @@ int main()
             }
 
             if(correctContentOrder == true){
-                int PM2_5Value = buffer[3] * 256 + buffer[2];
-                int PM10Value = buffer[5] *256 + buffer[4];
+                int PM2_5Value = buffer[3] * 256 + buffer[2]/10;
+                int PM10Value = buffer[5] *256 + buffer[4]/10;
                 
 
                 pc.printf("the sensorID is %X %X \r\n", buffer[6],buffer[7]);
