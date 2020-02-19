@@ -59,6 +59,8 @@ int main()
                 pc.printf("The air contains %d µg/m³ of PM2.5 \r\n", PM2_5Value);
                 pc.printf("The air contains %d µg/m³ of PM10 \r\n", PM10Value);
                 pc.printf("The current Checksum is %d en should be %d \r\n\n",checkSum(2,7,buffer),buffer[8]);
+            } else {
+                pc.printf("Data is corrupt \r\n");
             }
         }   
 
