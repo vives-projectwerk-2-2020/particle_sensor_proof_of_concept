@@ -10,12 +10,11 @@ Serial device(D1,D0);
 Serial pc(USBTX, USBRX);
 
 /* Const declaration */ 
-const unsigned int PACKET_SIZE =11;
+const unsigned int PACKET_SIZE =10;
 
 /* Program */
 
-
-int checkSum(int beginData, int endData,uint8_t Package[PACKET_SIZE]){
+int checkSum(int beginData, int endData,uint8_t Package[]){
     int checksum=0;
     for(int t=beginData; t<=endData; t++ ){
         checksum += Package[t];
@@ -23,44 +22,49 @@ int checkSum(int beginData, int endData,uint8_t Package[PACKET_SIZE]){
     return checksum%256;    // onboard checksum uses overflow ignore, so to compensate you need to get the rest of the devision
 }
 
-
 int main()
 { 
-    device.baud(9600);      // make sure this is NOT in a loop but on the first line of your main !!
+    device.baud(9600);      // make sure this is NOT in a loop but on the first line of your main !!                          
+    uint8_t buffer[PACKET_SIZE];    
+    int headData;
     while(1) {
-        
-        if(pc.readable()) {
-            device.putc(pc.getc());
+        headData = device.getc();
+        if(headData == 0xAA){            
+            buffer[0] = headData;
+            /* Is not a foolprove methode for the measured value can be 0xAB */
+            // int index = 1;
+            // while(headData != 0xAB){        
+            //     headData = device.getc();
+            //     buffer[index] = headData;
+            //     index++;
+            // }            
+            for( int t = 1; t<PACKET_SIZE; t++){
+                buffer[t] = device.getc();
+            }
+
+        } else {
+            pc.printf(" \r\n flushing \r\n");
+            // dont read for the data is wrong
         }
 
-        if(device.readable()){
-            bool correctContentOrder = false;
-            uint8_t buffer[PACKET_SIZE];
-            device.gets((char*) buffer,PACKET_SIZE);
+    /*   Prints the buffer in an ordered fashion*/
+    // for(int i=0; i<PACKET_SIZE; i++){
+    //     pc.printf(" %x",buffer[i]);
+    // }
+    // pc.printf(" -- \r\n--");   
+        double PM2_5Value = buffer[3] * 256 + buffer[2]/10.0;
+        double PM10Value = buffer[5] *256 + buffer[4]/10.0;        
+
+        pc.printf("\nThe sensorID is %X %X \r\n", buffer[6],buffer[7]);
+        pc.printf("The air contains %.1lf µg/m³ of PM2.5 \r\n", PM2_5Value);
+        pc.printf("The air contains %.1lf µg/m³ of PM10 \r\n", PM10Value);
+        
+        if(buffer[8] = checkSum(2,7,buffer)){
+            pc.printf("The current Checksum is correct \r\n"); 
+        } else {
+            pc.printf("The current Checksum is wrong, the data is corrupt \r\n");
+        }
+       
             
-            /*Prints the buffer in an ordered fashion
-            *for(int i=0; i<PACKET_SIZE-1; i++){
-            *    pc.printf(" %x",buffer[i]);
-            *}
-            *pc.printf(" -- \r\n--");            //add \r before new line to empty your buffer (makes sure it is always on a new line)
-            */
-           
-            if(buffer[0] == 170 && buffer[1] == 192 && buffer[9] == 171){
-                pc.printf("\nDe Message header/tail and the Commander numbers are correct \r\n");
-                correctContentOrder = true;
-            }
-
-            if(correctContentOrder == true){
-                int PM2_5Value = buffer[3] * 256 + buffer[2];
-                int PM10Value = buffer[5] *256 + buffer[4];
-                
-
-                pc.printf("the sensorID is %X %X \r\n", buffer[6],buffer[7]);
-                pc.printf("The air contains %d µg/m³ of PM2.5 \r\n", PM2_5Value);
-                pc.printf("The air contains %d µg/m³ of PM10 \r\n", PM10Value);
-                pc.printf("The current Checksum is %d en should be %d \r\n\n",checkSum(2,7,buffer),buffer[8]);
-            }
-        }   
-
-    }
+    } 
 }
